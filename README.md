@@ -1,53 +1,45 @@
-# java-core
+# Anoda Core | High-Performance Game Backend
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+![Java](https://img.shields.io/badge/Java-21-orange) ![Quarkus](https://img.shields.io/badge/Quarkus-Supersonic-blue) ![License](https://img.shields.io/badge/License-GPLV3.-green)
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+**Anoda Core** is a high-performance microservice backend for **GTA V (alt:V)** game server.
+The project is built on **Event-Driven architecture**, providing instant processing of inventory data, economy, and player statistics.
 
-## Running the application in dev mode
+## 🏗 Architecture
 
-You can run your application in dev mode that enables live coding using:
-```shell script
+The project is divided into two independent layers:
+
+1. **Anoda Core (this repository):** The "brain" of the system. Handles business logic, database operations, and heavy computations.
+2. **Anoda Bridge:** The "hands" of the system. A TypeScript adapter inside the game engine that translates commands to Core.
+
+Communication is done through **Redis Pub/Sub**, which allows physically separating the game server and backend on different machines (e.g., ARM for backend and x86 for game).
+
+## 🛠 Technology Stack
+
+* **Language:** Java 21
+* **Framework:** Quarkus (Supersonic Subatomic Java)
+* **Database:** PostgreSQL (Hibernate ORM / Panache)
+* **Cache & Bus:** Redis (Pub/Sub)
+* **Build:** Gradle
+
+## 🚀 How to Run (Dev Mode)
+
+For development with **Live Coding** support (changes applied without restart):
+
+```bash
 ./gradlew quarkusDev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+**Note:** Quarkus will start Dev UI at: http://localhost:8080/q/dev/
 
-## Packaging and running the application
+## 📦 Build (Production)
 
-The application can be packaged using:
-```shell script
+Creating an optimized JAR file:
+
+```bash
 ./gradlew build
 ```
-It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
 
-The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
+## 📄 License
 
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./gradlew build -Dquarkus.package.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using: 
-```shell script
-./gradlew build -Dquarkus.package.type=native
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./build/java-core-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling.
-
-## Related Guides
-
-- Redis Client ([guide](https://quarkus.io/guides/redis)): Connect to Redis in either imperative or reactive style
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
+This project is distributed under the GNU GPL v3.
