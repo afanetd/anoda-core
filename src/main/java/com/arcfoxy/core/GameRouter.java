@@ -1,5 +1,6 @@
 package com.arcfoxy.core;
 
+import com.arcfoxy.features.auth.AuthService;
 import com.arcfoxy.features.player.PlayerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.redis.datasource.ReactiveRedisDataSource;
@@ -22,7 +23,7 @@ public class GameRouter {
     @Inject ObjectMapper json;
     @Inject ManagedExecutor executor;
 
-    @Inject PlayerService playerService;
+    @Inject AuthService authService;
 
     public void init(@Observes StartupEvent ev) {
         LOG.info("🚦 ROUTER: Система запущена. Жду команды...");
@@ -34,15 +35,27 @@ public class GameRouter {
 
     private void routeMessage(String message) {
         try {
+            // 1. ЛОГИРУЕМ СЫРОЙ ЗАПРОС (Самое важное!)
+            LOG.info("📨 RAW MESSAGE FROM REDIS: {}", message);
+
             GameRequest req = json.readValue(message, GameRequest.class);
+
+            // 2. Проверяем, распарсилось ли поле data
+            if (req.data == null) {
+                LOG.error("❌ ОШИБКА ПАРСИНГА: Поле 'data' == null! Проверь имена полей в index.ts");
+                // Можно тут сделать return, чтобы не вызывать сервис и не ловить ошибку там
+                return; 
+            }
+
             GameResponse resp = null;
 
             switch (req.cmd) {
                 case "login":
-                    resp = playerService.login(req);
+                    resp = authService.login(req);
                     break;
-
-
+                case "register":
+                    resp = authService.register(req);
+                    break;
                 default:
                     LOG.warn("⚠️ Неизвестная команда: {}", req.cmd);
             }
