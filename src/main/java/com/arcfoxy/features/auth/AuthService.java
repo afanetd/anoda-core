@@ -2,9 +2,10 @@ package com.arcfoxy.features.auth;
 
 import com.arcfoxy.core.GameRequest;
 import com.arcfoxy.core.GameResponse;
-import com.arcfoxy.features.auth.dto.AuthDTO; // <--- ПЕРЕИМЕНОВАЛИ (бывший RegistrationDTO)
+import com.arcfoxy.features.auth.dto.AuthDTO;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.arcfoxy.features.auth.dto.LoginResponseDTO;
-import com.arcfoxy.features.player.PlayerData; // Не забудь импортировать!
+import com.arcfoxy.features.player.PlayerData;
 import com.arcfoxy.features.player.PlayerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -35,12 +36,12 @@ public class AuthService {
             Account account = Account.findByLogin(dto.username);
 
             if (account == null) {
-                return errorResponse("Пользователь не найден");
+                return errorResponse(request.player, "Пользователь не найден");
             }
 
             boolean isValid = checkPassword(dto.password, account.passwordHash);
             if (!isValid) {
-                return errorResponse("Неверный пароль");
+                return errorResponse(request.player, "Неверный пароль");
             }
 
             PlayerData stats = PlayerData.find("accountId", account.id).firstResult();
@@ -54,7 +55,7 @@ public class AuthService {
 
         } catch (Exception e) {
             LOG.error("Login error", e);
-            return errorResponse("Server Error");
+            return errorResponse(request.player, "Server Error");
         }
     }
 
@@ -67,7 +68,7 @@ public class AuthService {
             Account existingAccount = Account.findByLogin(dto.username);
 
             if (existingAccount != null) {
-                return errorResponse("Этот логин уже занят!");
+                return errorResponse(request.player, "Этот логин уже занят!");
             }
 
             Account newAccount = new Account();
@@ -84,7 +85,7 @@ public class AuthService {
 
         } catch (Exception e) {
             LOG.error("Registration error", e);
-            return errorResponse("Ошибка при регистрации");
+            return errorResponse(request.player, "Ошибка при регистрации");
         }
     }
 
@@ -102,11 +103,15 @@ public class AuthService {
 
             return response;
         } catch (Exception e) {
-            return errorResponse("Ошибка упаковки данных");
+            return new GameResponse("AUTH_ERROR", "{\"reason\": \"Serialization Error\"}");
         }
     }
 
-    private GameResponse errorResponse(String reason) {
-        return new GameResponse("AUTH_ERROR", "{\"reason\": \"" + reason + "\"}");
+    private GameResponse errorResponse(String targetPlayer, String reason) {
+        ObjectNode node = json.createObjectNode();
+        node.put("username", targetPlayer);
+        node.put("reason", reason);
+
+        return new GameResponse("AUTH_ERROR", node.toString());
     }
 }
