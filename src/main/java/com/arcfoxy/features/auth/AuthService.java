@@ -1,6 +1,7 @@
 package com.arcfoxy.features.auth;
 
 import com.arcfoxy.core.GameRequest;
+import com.arcfoxy.features.player.PlayerData;
 import com.arcfoxy.core.GameResponse;
 import com.arcfoxy.features.auth.dto.AuthDTO;
 import com.fasterxml.jackson.databind.node.ObjectNode;

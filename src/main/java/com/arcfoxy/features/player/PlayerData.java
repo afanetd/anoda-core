@@ -1,5 +1,6 @@
 package com.arcfoxy.features.player;
 
+import com.arcfoxy.features.auth.Account;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 
@@ -17,4 +18,8 @@ public class PlayerData extends PanacheEntity {
 
     public int health;
     public int armor;
+
+    public static PlayerData findByAccountId(Long accountId) {
+        return find("accountId", accountId).firstResult();
+    }
 }

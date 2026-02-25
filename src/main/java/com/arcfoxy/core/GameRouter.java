@@ -24,6 +24,7 @@ public class GameRouter {
     @Inject ManagedExecutor executor;
 
     @Inject AuthService authService;
+    @Inject PlayerService playerService;
 
     public void init(@Observes StartupEvent ev) {
         LOG.info("🚦 ROUTER: Система запущена. Жду команды...");
@@ -35,15 +36,12 @@ public class GameRouter {
 
     private void routeMessage(String message) {
         try {
-            // 1. ЛОГИРУЕМ СЫРОЙ ЗАПРОС (Самое важное!)
             LOG.info("📨 RAW MESSAGE FROM REDIS: {}", message);
 
             GameRequest req = json.readValue(message, GameRequest.class);
 
-            // 2. Проверяем, распарсилось ли поле data
             if (req.data == null) {
                 LOG.error("❌ ОШИБКА ПАРСИНГА: Поле 'data' == null! Проверь имена полей в index.ts");
-                // Можно тут сделать return, чтобы не вызывать сервис и не ловить ошибку там
                 return; 
             }
 
@@ -55,6 +53,9 @@ public class GameRouter {
                     break;
                 case "register":
                     resp = authService.register(req);
+                    break;
+                case "save_player":
+                    playerService.savePlayer(req);
                     break;
                 default:
                     LOG.warn("⚠️ Неизвестная команда: {}", req.cmd);
