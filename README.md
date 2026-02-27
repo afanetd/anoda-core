@@ -2,7 +2,7 @@
 
 ![Java](https://img.shields.io/badge/Java-21-orange) ![Quarkus](https://img.shields.io/badge/Quarkus-Supersonic-blue) ![License](https://img.shields.io/badge/License-GPLV3-green)
 
-**Anoda Core** is a high-performance microservice backend for **GTA V (alt:V)** game server.
+**Anoda Core** is a high-performance microservice backend for **GTA V (FiveM)** game server.
 The project is built on **Event-Driven architecture**, providing instant processing of inventory data, economy, and player statistics.
 
 ## 🏗 Architecture
